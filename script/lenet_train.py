@@ -52,9 +52,8 @@ if __name__ == "__main__":
         train_data = create_dataset("../TFRecord/train.tfrecords")
         val_data   = create_dataset("../TFRecord/val.tfrecords")
     
-        train_data = train_data.map(preprocess(brightness=True, switch_channel=True)).shuffle(100*PARAMS.batch_size).batch(PARAMS.batch_size)
+        train_data = train_data.map(preprocess(brightness=True, switch_channel=True)).shuffle(100*PARAMS['batch_size']).batch(PARAMS['batch_size'])
         val_data   = val_data.map(preprocess()).shuffle(100*PARAMS['batch_size']).batch(PARAMS['batch_size'])
-        print("Finish loading data!")
         
         # compile the model
         model = LeNet(kernel_size=PARAMS['kernel_size'], units=PARAMS['units'], reg=PARAMS['reg'])
@@ -69,7 +68,7 @@ if __name__ == "__main__":
         callbacks = [SendMetrics(), reduce_lr]
         
         # train
-        train(model, train_data, val_data, callbacks, PARAMS)
+        train(model, train_data, val_data, callbacks)
     except Exception as e:
         LOG.exception(e)
         raise

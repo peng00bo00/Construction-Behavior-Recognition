@@ -5,6 +5,7 @@ import json
 import numpy as np
 
 
+
 def encode_points(points, H=480, W=270):
   """
   Encode the human keypoints to a list.
