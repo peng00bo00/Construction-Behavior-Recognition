@@ -3,12 +3,8 @@
 import sys
 sys.path.append("..")
 import os
-import argparse
-import logging
-import nni
 import tensorflow as tf
 import itertools
-import json
 
 from model.model import Loss, OKS, SendMetrics
 from model.model import LeNet
