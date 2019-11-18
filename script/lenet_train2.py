@@ -6,7 +6,7 @@ import os
 import tensorflow as tf
 import itertools
 
-from model.model import Loss, OKS, SendMetrics
+from model.model import Loss, OKS
 from model.model import LeNet
 from dataset.dataset import create_dataset, preprocess
 from train import train
