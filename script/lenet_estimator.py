@@ -35,7 +35,7 @@ if __name__ == "__main__":
     kernel_sizes = [3, 5]
     regs = [1, 1e-3, 1e-5]
     unitss = [128, 256]
-    batch_sizes = [32, 64]
+    batch_sizes = [16, 32, 64]
     lams = [10, 100]
     
     epochs=100
@@ -56,11 +56,8 @@ if __name__ == "__main__":
             train_data = create_dataset("../TFRecord/train.tfrecords")
             val_data   = create_dataset("../TFRecord/val.tfrecords")
     
-            train_data = train_data.map(preprocess(brightness=True, switch_channel=True), num_parallel_calls=8).shuffle(10*batch_size).batch(batch_size).repeat()
-            val_data   = val_data.map(preprocess(), num_parallel_calls=8).shuffle(10*batch_size).batch(batch_size).repeat()
-            
-            train_data = train_data.prefetch(10)
-            val_data   = val_data.prefetch(10)
+            train_data = train_data.map(preprocess(brightness=True, switch_channel=True)).shuffle(10*batch_size).batch(batch_size).repeat()
+            val_data   = val_data.map(preprocess()).shuffle(10*batch_size).batch(batch_size).repeat()
                                     
             model = LeNet(kernel_size=kernel_size, units=units, reg=reg)
                                     
@@ -69,12 +66,14 @@ if __name__ == "__main__":
                           metrics=[OKS()]
                           )
             
+            est_model = tf.keras.estimator.model_to_estimator(keras_model=model)
+            
             reduce_lr = tf.keras.callbacks.ReduceLROnPlateau(monitor='val_loss', factor=0.5, patience=5, min_lr=1e-10)
             
             callbacks = [reduce_lr]
             
             hist = model.fit(train_data, callbacks=callbacks, validation_data=val_data, epochs=epochs, steps_per_epoch=1360//batch_size, validation_steps=173//batch_size)
-            _, metric = model.evaluate(val_data, verbose=0, steps=173//batch_size)
+            _, metric = model.evaluate(val_data, verbose=0)
             print(f"Current metric is {metric}")
             
             history = hist.history
