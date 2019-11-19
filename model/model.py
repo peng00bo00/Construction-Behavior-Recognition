@@ -81,7 +81,7 @@ class LeNet(tf.keras.Model):
 
   def __init__(self, kernel_size=3, units=128, reg=1e-3):
     super(LeNet, self).__init__()
-    # self.Input = tf.keras.layers.Input(shape=(H, W, C))
+    #self.Input = tf.keras.layers.Input(shape=(470, 270, 3))
     self.pre_conv = tf.keras.layers.Conv2D(16, kernel_size, activation="relu", 
                                            kernel_regularizer=tf.keras.regularizers.l2(reg))
     self.conv1 = tf.keras.layers.Conv2D(32, kernel_size, activation="relu", 
@@ -133,3 +133,34 @@ class LeNet(tf.keras.Model):
 
     y = self.dense3(x)
     return y
+
+
+def lenet(kernel_size=3, units=128, reg=1e-3, H=480, W=270, C=3):
+    inputs = tf.keras.layers.Input(shape=(H, W, C))
+    pre_conv = tf.keras.layers.Conv2D(16, kernel_size, activation="relu", 
+                                           kernel_regularizer=tf.keras.regularizers.l2(reg))(inputs)
+    conv1 = tf.keras.layers.Conv2D(32, kernel_size, activation="relu", 
+                                           kernel_regularizer=tf.keras.regularizers.l2(reg))(pre_conv)
+    bn1   = tf.keras.layers.BatchNormalization()(conv1)
+    pool1 = tf.keras.layers.MaxPool2D(2, padding="same")(bn1)
+    conv2 = tf.keras.layers.Conv2D(64, kernel_size, activation="relu", 
+                                           kernel_regularizer=tf.keras.regularizers.l2(reg))(pool1)
+    bn2   = tf.keras.layers.BatchNormalization()(conv2)
+    pool2 = tf.keras.layers.MaxPool2D(2, padding="same")(bn2)
+    conv3 = tf.keras.layers.Conv2D(128, kernel_size, activation="relu", 
+                                           kernel_regularizer=tf.keras.regularizers.l2(reg))(pool2)
+    bn3   = tf.keras.layers.BatchNormalization()(conv3)
+    pool3 = tf.keras.layers.MaxPool2D(2, padding="same")(bn3)
+
+    flatten = tf.keras.layers.Flatten()(pool3)
+    dense1 = tf.keras.layers.Dense(units, activation="relu", 
+                                           kernel_regularizer=tf.keras.regularizers.l2(reg))(flatten)
+    bn4    = tf.keras.layers.BatchNormalization()(dense1)
+    dense2 = tf.keras.layers.Dense(units, activation="relu", 
+                                           kernel_regularizer=tf.keras.regularizers.l2(reg))(bn4)
+    bn5    = tf.keras.layers.BatchNormalization()(dense2)
+    dense3 = tf.keras.layers.Dense(45, activation="sigmoid", 
+                                           kernel_regularizer=tf.keras.regularizers.l2(reg))(bn5)
+    
+    model = tf.keras.Model(inputs=inputs, outputs=dense3, name='lenet_model')
+    return model
