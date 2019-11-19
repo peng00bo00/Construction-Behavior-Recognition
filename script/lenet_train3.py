@@ -38,7 +38,7 @@ if __name__ == "__main__":
     batch_sizes = [32, 64]
     lams = [10, 100]
     
-    epochs=1
+    epochs=100
     
     comb = itertools.product(learning_rates, kernel_sizes, regs, unitss, batch_sizes, lams)
     
