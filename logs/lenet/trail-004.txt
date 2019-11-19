@@ -1,0 +1,1 @@
+{'loss': [305.6922466300126], 'object_keypoint_similarity': [0.055023137], 'val_loss': [194.94230143229166], 'val_object_keypoint_similarity': [0.09432641], 'lr': [0.001], 'ID': 4, 'kernel_size': 3, 'reg': 1, 'units': 128, 'batch_size': 64, 'lam': 10}

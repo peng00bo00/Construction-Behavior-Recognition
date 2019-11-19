@@ -38,6 +38,8 @@ if __name__ == "__main__":
     batch_sizes = [16, 32, 64]
     lams = [10, 100]
     
+    epochs=100
+    
     comb = itertools.product(learning_rates, kernel_sizes, regs, unitss, batch_sizes, lams)
     
     best_metric = 0
@@ -54,8 +56,8 @@ if __name__ == "__main__":
             train_data = create_dataset("../TFRecord/train.tfrecords")
             val_data   = create_dataset("../TFRecord/val.tfrecords")
     
-            train_data = train_data.map(preprocess(brightness=True, switch_channel=True)).shuffle(100*batch_size).batch(batch_size)
-            val_data   = val_data.map(preprocess()).shuffle(100*batch_size).batch(batch_size)
+            train_data = train_data.map(preprocess(brightness=True, switch_channel=True)).shuffle(10*batch_size).batch(batch_size).repeat()
+            val_data   = val_data.map(preprocess()).shuffle(10*batch_size).batch(batch_size).repeat()
                                     
             model = LeNet(kernel_size=kernel_size, units=units, reg=reg)
                                     
@@ -68,7 +70,7 @@ if __name__ == "__main__":
             
             callbacks = [reduce_lr]
             
-            hist = train(model, train_data, val_data, callbacks, epochs=100)
+            hist = model.fit(train_data, callbacks=callbacks, validation_data=val_data, epochs=epochs, steps_per_epoch=1360//batch_size, validation_steps=173//batch_size)
             _, metric = model.evaluate(val_data, verbose=0)
             print(f"Current metric is {metric}")
             
