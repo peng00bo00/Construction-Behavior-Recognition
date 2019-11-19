@@ -35,7 +35,7 @@ if __name__ == "__main__":
     kernel_sizes = [3, 5]
     regs = [1, 1e-3, 1e-5]
     unitss = [128, 256]
-    batch_sizes = [32, 64]
+    batch_sizes = [8]
     lams = [10, 100]
     
     epochs=100
