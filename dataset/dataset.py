@@ -113,6 +113,7 @@ def preprocess(brightness=False, switch_channel=False):
         ## Parse the element
         X = tf.image.decode_jpeg(parsed['image_raw'])
         X = tf.cast(X, tf.float32)
+        X = tf.image.resize(X, (128,64))
     
         y = parsed['points']
 

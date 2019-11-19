@@ -7,11 +7,12 @@ import logging
 import nni
 import tensorflow as tf
 
-from model.model import Loss, OKS, SendMetrics
+from model.model import Loss, OKS
 from model.model import LeNet
 from dataset.dataset import create_dataset, preprocess
-from train import train
 
+
+LOG = logging.getLogger('LeNet-keras')
 
 def generate_default_params():
     '''
@@ -26,14 +27,37 @@ def generate_default_params():
         'lam': 10,
         
     }
+    
+    
+def train(model, train_data, val_data, callbacks, epochs=100,):
+    '''
+    Train model
+    '''
+    
+    hist = model.fit(train_data, callbacks=callbacks, validation_data=val_data, epochs=epochs)
 
+    _, metric = model.evaluate(val_data, verbose=0)
+    LOG.debug('Final result is: %d', metric)
+    nni.report_final_result(metric)
+    
+    return hist
+
+
+class SendMetrics(tf.keras.callbacks.Callback):
+    '''
+    Keras callback to send metrics to NNI framework
+    '''
+    def on_epoch_end(self, epoch, logs={}):
+        '''
+        Run on end of each epoch
+        '''
+        LOG.debug(logs)
+        nni.report_intermediate_result(logs["val_object_keypoint_similarity"])
+        
 
 
 
 if __name__ == "__main__":
-    
-    LOG = logging.getLogger('LeNet-keras')
-    
     PARSER = argparse.ArgumentParser()
     PARSER.add_argument("--epochs", type=int, default=10, help="Train epochs", required=False)
 
@@ -47,13 +71,16 @@ if __name__ == "__main__":
         LOG.debug(RECEIVED_PARAMS)
         PARAMS = generate_default_params()
         PARAMS.update(RECEIVED_PARAMS)
+        print("Params updated!")
         
         # load dataset
         train_data = create_dataset("../TFRecord/train.tfrecords")
         val_data   = create_dataset("../TFRecord/val.tfrecords")
     
-        train_data = train_data.map(preprocess(brightness=True, switch_channel=True)).shuffle(100*PARAMS['batch_size']).batch(PARAMS['batch_size'])
-        val_data   = val_data.map(preprocess()).shuffle(100*PARAMS['batch_size']).batch(PARAMS['batch_size'])
+        train_data = train_data.map(preprocess(brightness=True, switch_channel=True)).shuffle(100*PARAMS['batch_size']).batch(PARAMS['batch_size']).repeat(ARGS.epochs)
+        val_data   = val_data.map(preprocess()).shuffle(100*PARAMS['batch_size']).batch(PARAMS['batch_size']).repeat(ARGS.epochs)
+        print("Create the dataset!")
+        
         
         # compile the model
         model = LeNet(kernel_size=PARAMS['kernel_size'], units=PARAMS['units'], reg=PARAMS['reg'])
@@ -62,13 +89,17 @@ if __name__ == "__main__":
               metrics=[OKS()]
               )
         
+        print("Compile the model!")
+        
         # define callbacks
         reduce_lr = tf.keras.callbacks.ReduceLROnPlateau(monitor='val_loss', factor=0.5,
                                                   patience=5, min_lr=1e-10)
         callbacks = [SendMetrics(), reduce_lr]
         
         # train
-        train(model, train_data, val_data, callbacks)
+        print("Start training!")
+        train(model, train_data, val_data, callbacks, epochs=1)
+        
     except Exception as e:
         LOG.exception(e)
         raise

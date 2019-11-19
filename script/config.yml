@@ -5,6 +5,8 @@ maxExecDuration: 1h
 maxTrialNum: 10
 #choice: local, remote, pai
 trainingServicePlatform: local
+localConfig:
+  useActiveGpu: true
 #search_space.json path
 searchSpacePath: search_space.json
 #choice: true, false
@@ -17,6 +19,6 @@ tuner:
     #choice: maximize, minimize
     optimize_mode: maximize
 trial:
-  command: python3 lenet_train.py
+  command: python3 lenet_nni.py
   codeDir: .
   gpuNum: 1

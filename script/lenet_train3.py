@@ -62,7 +62,7 @@ if __name__ == "__main__":
             train_data = train_data.prefetch(1)
             val_data   = val_data.prefetch(1)
                                     
-            model = lenet(kernel_size=kernel_size, units=units, reg=reg)
+            model = lenet(kernel_size=kernel_size, units=units, reg=reg, H=128, W=64, C=3)
                                     
             model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate),
                           loss=Loss(lam=lam),

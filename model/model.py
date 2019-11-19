@@ -65,17 +65,6 @@ class OKS(tf.keras.metrics.Metric):
     return tf.math.divide_no_nan(self.oks, self.count)
 
 
-class SendMetrics(tf.keras.callbacks.Callback):
-    '''
-    Keras callback to send metrics to NNI framework
-    '''
-    def on_epoch_end(self, epoch, logs={}):
-        '''
-        Run on end of each epoch
-        '''
-        LOG.debug(logs)
-        nni.report_intermediate_result(logs["val_acc"])
-
 
 class LeNet(tf.keras.Model):
 
