@@ -42,8 +42,8 @@ def load_dataset(params, args):
     train_data = create_dataset("../TFRecord/train.tfrecords")
     val_data   = create_dataset("../TFRecord/val.tfrecords")
     
-    train_data = train_data.map(preprocess(brightness=True, switch_channel=True)).shuffle(10*params['batch_size']).prefetch(buffer_size=tf.data.experimental.AUTOTUNE).batch(params['batch_size'])
-    val_data   = val_data.map(preprocess()).shuffle(10*params['batch_size']).prefetch(buffer_size=tf.data.experimental.AUTOTUNE).batch(params['batch_size'])
+    train_data = train_data.map(preprocess(brightness=True, switch_channel=True)).shuffle(10*params['batch_size']).prefetch(buffer_size=tf.data.experimental.AUTOTUNE).batch(params['batch_size']).repeat()
+    val_data   = val_data.map(preprocess()).shuffle(10*params['batch_size']).prefetch(buffer_size=tf.data.experimental.AUTOTUNE).batch(params['batch_size']).repeat()
 
     return train_data, val_data
     
