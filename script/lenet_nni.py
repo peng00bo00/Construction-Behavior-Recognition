@@ -64,7 +64,7 @@ def train(params, args):
     LOG.debug("Start training!")
     model.fit(train_data, callbacks=callbacks, validation_data=val_data, epochs=args.epochs)
 
-    _, metric = model.evaluate(val_data, verbose=0, steps=173//params['batch_size'])
+    _, metric = model.evaluate(val_data, verbose=0)
     LOG.debug('Final result is: %d', metric)
     nni.report_final_result(metric)
     LOG.debug("End training!")
@@ -80,7 +80,7 @@ class SendMetrics(tf.keras.callbacks.Callback):
         Run on end of each epoch
         '''
         LOG.debug(logs)
-        nni.report_intermediate_result(logs["val_object_keypoint_similarity"])
+        nni.report_intermediate_result(logs.get("val_object_keypoint_similarity", 0))
         
 
 
