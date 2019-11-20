@@ -8,7 +8,7 @@ import nni
 import tensorflow as tf
 
 from model.model import Loss, OKS
-from model.model import LeNet
+from model.model import InceptionModule, GoogleNet
 from dataset.dataset import create_dataset, preprocess
 
 
@@ -30,7 +30,7 @@ def generate_default_params():
     }
 
 def create_model(params):
-    model = LeNet(channel=params['channel'], kernel_size=params['kernel_size'], units=params['units'], reg=params['reg'])
+    model = GoogleNet(channel=params['channel'], kernel_size=params['kernel_size'], units=params['units'], reg=params['reg'])
     model.compile(optimizer=tf.keras.optimizers.Adam(params['learning_rate']),
                   loss=Loss(lam=params['lam']),
                   metrics=[OKS()]
@@ -42,8 +42,8 @@ def load_dataset(params, args):
     train_data = create_dataset("../TFRecord/train.tfrecords")
     val_data   = create_dataset("../TFRecord/val.tfrecords")
     
-    train_data = train_data.map(preprocess(brightness=True, switch_channel=True)).shuffle(10*params['batch_size']).prefetch(buffer_size=tf.data.experimental.AUTOTUNE).batch(params['batch_size'])
-    val_data   = val_data.map(preprocess()).shuffle(10*params['batch_size']).prefetch(buffer_size=tf.data.experimental.AUTOTUNE).batch(params['batch_size'])
+    train_data = train_data.map(preprocess(brightness=True, switch_channel=True)).shuffle(10*params['batch_size']).prefetch(buffer_size=tf.data.experimental.AUTOTUNE).batch(params['batch_size']).repeat()
+    val_data   = val_data.map(preprocess()).shuffle(10*params['batch_size']).prefetch(buffer_size=tf.data.experimental.AUTOTUNE).batch(params['batch_size']).repeat()
 
     return train_data, val_data
     
@@ -64,7 +64,7 @@ def train(params, args):
     
     LOG.debug("Start training!")
     model.fit(train_data, callbacks=callbacks, validation_data=val_data, epochs=args.epochs, steps_per_epoch=1360/params['batch_size'], validation_steps=173/params['batch_size'])
-
+    
     _, metric = model.evaluate(val_data, verbose=0)
     LOG.debug('Final result is: %d', metric)
     nni.report_final_result(metric)

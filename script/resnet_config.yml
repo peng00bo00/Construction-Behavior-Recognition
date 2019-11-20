@@ -1,0 +1,32 @@
+authorName: pengbo
+experimentName: resnet_keras
+trialConcurrency: 1
+maxExecDuration: 72h
+maxTrialNum: 100
+#choice: local, remote, pai
+trainingServicePlatform: local
+#localConfig:
+#  useActiveGpu: true
+#search_space.json path
+searchSpacePath: resnet_search_space.json
+#choice: true, false
+useAnnotation: false
+tuner:
+  #choice: TPE, Random, Anneal, Evolution, BatchTuner, MetisTuner
+  #SMAC (SMAC should be installed through nnictl)
+  builtinTunerName: TPE
+  classArgs:
+    #choice: maximize, minimize
+    optimize_mode: maximize
+trial:
+  command: python3 resnet_nni.py --epochs 100
+  codeDir: .
+  gpuNum: 0
+assessor:
+    builtinAssessorName: Curvefitting
+    classArgs:
+      epoch_num: 50
+      optimize_mode: maximize
+      start_step: 6
+      threshold: 0.5
+      gap: 2

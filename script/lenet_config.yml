@@ -1,14 +1,14 @@
-authorName: default
+authorName: pengbo
 experimentName: lenet_keras
 trialConcurrency: 1
-maxExecDuration: 1h
-maxTrialNum: 10
+maxExecDuration: 72h
+maxTrialNum: 100
 #choice: local, remote, pai
 trainingServicePlatform: local
-localConfig:
-  useActiveGpu: true
+#localConfig:
+#  useActiveGpu: true
 #search_space.json path
-searchSpacePath: search_space.json
+searchSpacePath: lenet_search_space.json
 #choice: true, false
 useAnnotation: false
 tuner:
@@ -19,6 +19,14 @@ tuner:
     #choice: maximize, minimize
     optimize_mode: maximize
 trial:
-  command: python3 lenet_nni.py
+  command: python3 lenet_nni.py --epochs 100
   codeDir: .
-  gpuNum: 1
+  gpuNum: 0
+assessor:
+    builtinAssessorName: Curvefitting
+    classArgs:
+      epoch_num: 50
+      optimize_mode: maximize
+      start_step: 6
+      threshold: 0.5
+      gap: 2
