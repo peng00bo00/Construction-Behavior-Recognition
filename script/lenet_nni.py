@@ -41,8 +41,8 @@ def load_dataset(params, args):
     train_data = create_dataset("../TFRecord/train.tfrecords")
     val_data   = create_dataset("../TFRecord/val.tfrecords")
     
-    train_data = train_data.map(preprocess(brightness=True, switch_channel=True)).shuffle(10*params['batch_size']).batch(params['batch_size']).repeat()
-    val_data   = val_data.map(preprocess()).shuffle(10*params['batch_size']).batch(params['batch_size']).repeat()
+    train_data = train_data.map(preprocess(brightness=True, switch_channel=True)).shuffle(10*params['batch_size']).prefetch(buffer_size=tf.data.experimental.AUTOTUNE).batch(params['batch_size'])
+    val_data   = val_data.map(preprocess()).shuffle(10*params['batch_size']).prefetch(buffer_size=tf.data.experimental.AUTOTUNE).batch(params['batch_size'])
 
     return train_data, val_data
     
@@ -62,7 +62,7 @@ def train(params, args):
     callbacks=[SendMetrics(), reduce_lr]
     
     LOG.debug("Start training!")
-    model.fit(train_data, callbacks=callbacks, validation_data=val_data, epochs=args.epochs, steps_per_epoch=1360//params['batch_size'], validation_steps=173//params['batch_size'])
+    model.fit(train_data, callbacks=callbacks, validation_data=val_data, epochs=args.epochs)
 
     _, metric = model.evaluate(val_data, verbose=0, steps=173//params['batch_size'])
     LOG.debug('Final result is: %d', metric)
@@ -86,7 +86,7 @@ class SendMetrics(tf.keras.callbacks.Callback):
 
 if __name__ == "__main__":
     PARSER = argparse.ArgumentParser()
-    PARSER.add_argument("--epochs", type=int, default=100, help="Train epochs", required=False)
+    PARSER.add_argument("--epochs", type=int, default=10, help="Train epochs", required=False)
 
     ARGS, UNKNOWN = PARSER.parse_known_args()
     
