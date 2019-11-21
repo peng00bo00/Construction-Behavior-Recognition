@@ -65,7 +65,7 @@ def train(params, args):
     LOG.debug("Start training!")
     model.fit(train_data, callbacks=callbacks, validation_data=val_data, epochs=args.epochs, steps_per_epoch=1360/params['batch_size'], validation_steps=173/params['batch_size'])
 
-    _, metric = model.evaluate(val_data, verbose=0)
+    _, metric = model.evaluate(val_data, verbose=0, steps=173/params['batch_size'])
     LOG.debug('Final result is: %d', metric)
     nni.report_final_result(metric)
     LOG.debug("End training!")
