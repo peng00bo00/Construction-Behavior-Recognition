@@ -1,6 +1,6 @@
 {
     "learning_rate":{"_type":"choice","_value":[0.00001, 0.0001, 0.001, 0.01]},
-    "channel": {"_type": "choice", "_value": [16, 32, 64]},
+    "channel": {"_type": "choice", "_value": [8, 16, 32]},
     "kernel_size": {"_type": "choice", "_value": [3, 5]},
     "reg": {"_type": "choice", "_value": [1, 0.1, 0.01, 0.001, 0.0001, 0.00001]},
     "units": {"_type": "choice", "_value": [128, 256]},
