@@ -5,8 +5,8 @@ maxExecDuration: 100h
 maxTrialNum: 100
 #choice: local, remote, pai
 trainingServicePlatform: local
-#localConfig:
-#  useActiveGpu: true
+localConfig:
+  useActiveGpu: true
 #search_space.json path
 searchSpacePath: resnet_search_space.json
 #choice: true, false
@@ -21,7 +21,7 @@ tuner:
 trial:
   command: python3 resnet_nni.py --epochs 100
   codeDir: .
-  gpuNum: 0
+  gpuNum: 1
 assessor:
     builtinAssessorName: Curvefitting
     classArgs:
