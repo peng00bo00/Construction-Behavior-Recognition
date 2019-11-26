@@ -63,7 +63,7 @@ def train(params, args):
     callbacks=[SendMetrics(), reduce_lr]
     
     LOG.debug("Start training!")
-    model.fit(train_data, callbacks=callbacks, validation_data=val_data, epochs=args.epochs, steps_per_epoch=1360/params['batch_size'], validation_steps=173/params['batch_size'])
+    model.fit(train_data, callbacks=callbacks, verbose=1, validation_data=val_data, epochs=args.epochs, steps_per_epoch=1360/params['batch_size'], validation_steps=173/params['batch_size'])
 
     _, metric = model.evaluate(val_data, verbose=0, steps=173/params['batch_size'])
     LOG.debug('Final result is: %d', metric)
@@ -100,6 +100,10 @@ if __name__ == "__main__":
         PARAMS = generate_default_params()
         PARAMS.update(RECEIVED_PARAMS)
         # train
+        gpus = tf.config.experimental.list_physical_devices('GPU')
+        for gpu in gpus:
+            tf.config.experimental.set_memory_growth(gpu, True)
+        
         train(PARAMS, ARGS)
         
     except Exception as e:

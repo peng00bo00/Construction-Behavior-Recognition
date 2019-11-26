@@ -23,10 +23,7 @@ trial:
   codeDir: .
   gpuNum: 1
 assessor:
-    builtinAssessorName: Curvefitting
+    builtinAssessorName: Medianstop
     classArgs:
-      epoch_num: 50
       optimize_mode: maximize
-      start_step: 6
-      threshold: 0.5
-      gap: 2
+      start_step: 20
